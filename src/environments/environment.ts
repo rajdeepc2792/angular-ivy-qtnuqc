@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  urlAddress: ""
+  urlAddress: "",
+  token: "4/0AX4XfWjmbFMiJnevABu4Sfob5q2bfAoZEpjDDI0tls4SrkD0DbPhfGWaZYMkQcZgPGgssg"
 };
 
 /*
