@@ -1,4 +1,17 @@
-<hello name="{{ name }}"></hello>
-<p>
-  Start editing to see some magic happen :)
-</p>
+<div class="filter-form">
+  <mat-form-field>
+    <input matInput (keyup)="search($event.target.value)">
+  </mat-form-field>
+</div>
+
+<div class="search-result-container mat-elevation-z8">
+  <mat-table [dataSource]="resultData" matSort (matSortChange)="sortData($event)">
+    <ng-container matColumnDef="id">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> ID </mat-header-cell>
+      <mat-cell *matCellDef="let row"> {{row.id}} </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedCol"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedCol;"></mat-row>
+  </mat-table>
+</div>
