@@ -1,14 +1,27 @@
 <div class="filter-form">
   <mat-form-field>
-    <input matInput (keyup)="search($event.target.value)">
+    <input matInput (input)="search($any($event.target).value)" placeholder = "Search String">
   </mat-form-field>
 </div>
 
 <div class="search-result-container mat-elevation-z8">
-  <mat-table [dataSource]="resultData" matSort (matSortChange)="sortData($event)">
-    <ng-container matColumnDef="id">
-      <mat-header-cell *matHeaderCellDef mat-sort-header> ID </mat-header-cell>
-      <mat-cell *matCellDef="let row"> {{row.id}} </mat-cell>
+  <ng-container *ngIf="loading">
+    <mat-progress-spinner
+      class="spinner" 
+      color="primary"
+      mode="indeterminate"
+    >
+    </mat-progress-spinner>
+  </ng-container>
+  <ng-container *ngIf="isEmpty() && !loading">
+    <div class="no-data">
+      No Records Found
+    </div>
+  </ng-container>
+  <mat-table *ngIf="!isEmpty() && !loading" [dataSource]="dataSource" matSort (matSortChange)="sortData($event)">
+    <ng-container matColumnDef="response">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Results </mat-header-cell>
+      <mat-cell *matCellDef="let row"> {{row.response}} </mat-cell>
     </ng-container>
 
     <mat-header-row *matHeaderRowDef="displayedCol"></mat-header-row>

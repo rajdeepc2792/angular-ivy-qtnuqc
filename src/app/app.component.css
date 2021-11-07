@@ -1,3 +1,26 @@
 p {
   font-family: Lato;
 }
+
+.search-result-container {
+  text-align: center;
+  text-align: -webkit-center;
+}
+
+mat-table {
+  width: 50%
+}
+
+.filter-form {
+  text-align: center;
+}
+
+.no-data {
+  color: rgba(0, 0, 0, 0.54);
+  padding-top: 25px;
+  padding-bottom: 25px;
+}
+
+.spinner {
+  transform: scale(0.5);
+}

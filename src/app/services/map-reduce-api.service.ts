@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment.prod';
+import { MapReduceData } from '../app.component';
 
 
 @Injectable({
@@ -9,9 +10,9 @@ import { environment } from 'src/environments/environment.prod';
 export class MapReduceApiService {
   constructor(private http: HttpClient) { }
 
-  public getData = (route: string, searchString: string) => {
+  public getData = (searchString: string) => {
     const headerURL = environment.urlAddress
-    return this.http.get(`${headerURL}/${route}`);
+    return this.http.post<MapReduceData>(`${headerURL}`,{"search_word": searchString});
   }
 }
 

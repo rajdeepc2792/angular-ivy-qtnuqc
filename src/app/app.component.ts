@@ -2,9 +2,15 @@ import { Component } from '@angular/core';
 import { Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { MapReduceApiService } from './services/map-reduce-api.service';
+import { debounceTime, filter, map, switchMap, tap } from 'rxjs/operators'
+import { Observable, Subject } from 'rxjs';
 
 export interface MapReduceData {
-  id: string
+  result: string
+}
+
+export interface Results {
+  response: string
 }
 
 @Component({
@@ -16,35 +22,51 @@ export interface MapReduceData {
 export class AppComponent {
   title = 'MapReducerSearchFE';
   searchString = ''
-  displayedCol = ['id'];
-  dataSource: MatTableDataSource<MapReduceData>;
+  displayedCol = ['response'];
+  dataSource: MatTableDataSource<Results>;
+  result$: Observable<string[]>;
+  subject = new Subject<string>();
+  loading = false
 
   constructor(private mapService: MapReduceApiService) {
-    const data: MapReduceData[] = [];
-    for(let i = 1; i<=100; i++) {
-      data.push({id: i.toString()})
-    }
-
+    const data: Results[] = [];
     this.dataSource = new MatTableDataSource(data);
   }
 
   ngOnInit() {
+    this.result$ = this.subject.pipe(
+      tap(() => {this.loading = true}),
+      debounceTime(500),
+      switchMap((searchValue: string) => this.mapService.getData(searchValue)),
+      map(data => data.result.split('\n'))
+    );
+    
+    this.result$.subscribe((result_data) =>{
+      result_data = result_data.filter(s => s.length != 0 && s != "Error: could not handle the request");
+      const data = result_data.map(s => ({response: s}))
+      this.dataSource.data = data;
+      this.loading = false
+    }, error => {
+      this.dataSource.data = []
+      console.error(error)
+      this.loading = false
+    })
+
     this.loadInitialData(this.searchString)
   }
 
   loadInitialData(searchValue: string) {
-    this.mapService.getData('','').subscribe(response => {
-      const data: MapReduceData[] = [];
-      for(let i = 1; i<=100; i++) {
-        data.push({id: i.toString()})
-      }
-      this.dataSource.data = data;
-    }, error => console.error(error));
+    this.subject.next(searchValue);
   }
 
   search(search: string) {
-    this.searchString = search.trim();
-    this.searchString = search.toLowerCase();
+    if(search != null) {
+      this.searchString = search.trim();
+      this.searchString = search.toLowerCase();
+    }
+    else {
+      this.searchString = ""
+    }
 
     this.loadInitialData(this.searchString)
   }
@@ -60,11 +82,15 @@ export class AppComponent {
       const isAsc = sort.direction === 'asc';
       switch (sort.active) {
         case 'name':
-          return compare(a.id, b.id, isAsc);
+          return compare(a.response, b.response, isAsc);
         default:
           return 0;
       }
     });
+  }
+
+  isEmpty() {
+    return this.dataSource.data.length === 0;
   }
 }
 
